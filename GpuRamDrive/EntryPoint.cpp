@@ -64,37 +64,39 @@ int APIENTRY wWinMain(
 	bool GpuMount = false;
 	bool HelpRequest = false;
 
-	if (szArglist) {
-		for (int i = 0; i < nArgs; i++) {
-			if (_wcsicmp(szArglist[i], L"--device") == 0 && i + 1 < nArgs)
+	if(szArglist)
+	{
+		for(int i = 0; i < nArgs; i++)
+		{
+			if(_wcsicmp(szArglist[i], L"--device") == 0 && i + 1 < nArgs)
 			{
 				GpuDevice = szArglist[i + 1];
 			}
-			else if (_wcsicmp(szArglist[i], L"--size") == 0 && i + 1 < nArgs)
+			else if(_wcsicmp(szArglist[i], L"--size") == 0 && i + 1 < nArgs)
 			{
 				GpuSize = _wtoi64(szArglist[i + 1]);
 			}
-			else if (_wcsicmp(szArglist[i], L"--mount") == 0 && i + 1 < nArgs)
+			else if(_wcsicmp(szArglist[i], L"--mount") == 0 && i + 1 < nArgs)
 			{
 				GpuDriveLetter = szArglist[i + 1];
 			}
-			else if (_wcsicmp(szArglist[i], L"--format") == 0 && i + 1 < nArgs)
+			else if(_wcsicmp(szArglist[i], L"--format") == 0 && i + 1 < nArgs)
 			{
 				GpuFormatParam = szArglist[i + 1];
 			}
-			else if (_wcsicmp(szArglist[i], L"--type") == 0 && i + 1 < nArgs)
+			else if(_wcsicmp(szArglist[i], L"--type") == 0 && i + 1 < nArgs)
 			{
 				GpuDriveType = szArglist[i + 1];
 			}
-			else if (_wcsicmp(szArglist[i], L"--removable") == 0)
+			else if(_wcsicmp(szArglist[i], L"--removable") == 0)
 			{
 				GpuDriveRemovable = true;
 			}
-			else if (_wcsicmp(szArglist[i], L"--hide") == 0)
+			else if(_wcsicmp(szArglist[i], L"--hide") == 0)
 			{
 				nCmdShow = SW_HIDE;
 			}
-			else if (_wcsicmp(szArglist[i], L"--help") == 0 ||
+			else if(_wcsicmp(szArglist[i], L"--help") == 0 ||
 				_wcsicmp(szArglist[i], L"-h") == 0 ||
 				_wcsicmp(szArglist[i], L"/h") == 0 ||
 				_wcsicmp(szArglist[i], L"/?") == 0)
@@ -103,8 +105,10 @@ int APIENTRY wWinMain(
 			}
 		}
 
-		if (HelpRequest) {
-			if (GetConsoleWindow() == NULL) {
+		if(HelpRequest)
+		{
+			if(GetConsoleWindow() == NULL)
+			{
 				MessageBoxW(NULL, GPU_HELP_STRING, L"GpuRamDrive help", MB_OK);
 			}
 			wprintf(GPU_HELP_STRING);
@@ -114,19 +118,22 @@ int APIENTRY wWinMain(
 		GpuMount = GpuDevice && GpuSize && GpuDriveLetter;
 	}
 
-	if (!gui.Create(hInstance, L"GPU Ram Drive", nCmdShow)) {
+	if(!gui.Create(hInstance, L"GPU Ram Drive", nCmdShow))
+	{
 		return -1;
 	}
 
-	if (GpuMount) {
+	if(GpuMount)
+	{
 		try
 		{
 			gui.Mount(GpuDevice, GpuSize, GpuDriveLetter, GpuFormatParam, GpuDriveType, GpuDriveRemovable);
 		}
-		catch (const std::exception& ex)
+		catch(const std::exception& ex)
 		{
 			gui.RestoreWindow();
-			if (GetConsoleWindow() == NULL) {
+			if(GetConsoleWindow() == NULL)
+			{
 				MessageBoxA(NULL, ex.what(), "GpuRamDrive error", MB_OK);
 			}
 			fprintf(stderr, "GpuRamDrive exception: %s\n", ex.what());

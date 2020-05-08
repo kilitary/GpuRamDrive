@@ -55,8 +55,7 @@ GpuRamGui::GpuRamGui()
 
 
 GpuRamGui::~GpuRamGui()
-{
-}
+{}
 
 bool GpuRamGui::Create(HINSTANCE hInst, const std::wstring& title, int nCmdShow)
 {
@@ -68,7 +67,7 @@ bool GpuRamGui::Create(HINSTANCE hInst, const std::wstring& title, int nCmdShow)
 	m_hWnd = CreateWindowW(GPU_GUI_CLASS, title.c_str(), WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, 0, 700, 320, nullptr, nullptr, m_Instance, this);
 
-	if (!m_hWnd) return false;
+	if(!m_hWnd) return false;
 
 	ShowWindow(m_hWnd, nCmdShow);
 	UpdateWindow(m_hWnd);
@@ -80,13 +79,13 @@ int GpuRamGui::Loop()
 {
 	MSG msg;
 
-	while (GetMessage(&msg, nullptr, 0, 0))
+	while(GetMessage(&msg, nullptr, 0, 0))
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
 
-	return (int)msg.wParam;
+	return (int) msg.wParam;
 }
 
 void GpuRamGui::Mount(const std::wstring& device, size_t size, const std::wstring& driveLetter, const std::wstring& formatParam, const std::wstring& driveType, bool removable)
@@ -96,14 +95,16 @@ void GpuRamGui::Mount(const std::wstring& device, size_t size, const std::wstrin
 	size_t memSize = size * 1024 * 1024;
 
 	auto vGpu = m_RamDrive.GetGpuDevices();
-	for (auto it = vGpu.begin(); it != vGpu.end(); it++, n++) {
-		if (ToWide(it->name).find(device) != std::string::npos) {
+	for(auto it = vGpu.begin(); it != vGpu.end(); it++, n++)
+	{
+		if(ToWide(it->name).find(device) != std::string::npos)
+		{
 			found = true;
 			break;
 		}
 	}
 
-	if (!found) throw std::runtime_error("Unable to find device specified");
+	if(!found) throw std::runtime_error("Unable to find device specified");
 
 	m_RamDrive.SetDriveType(driveType.c_str());
 	m_RamDrive.SetRemovable(removable);
@@ -113,7 +114,7 @@ void GpuRamGui::Mount(const std::wstring& device, size_t size, const std::wstrin
 	ComboBox_SetCurSel(m_CtlDriveLetter, (driveLetter[0] <= 'Z' ? driveLetter[0] - 'A' : driveLetter[0] - 'a'));
 
 	wchar_t szTemp[64];
-	_itow_s((int)size, szTemp, 10);
+	_itow_s((int) size, szTemp, 10);
 	Edit_SetText(m_CtlMemSize, szTemp);
 }
 
@@ -132,39 +133,40 @@ void GpuRamGui::OnCreate()
 	HWND hStatic;
 
 	hStatic = CreateWindow(L"STATIC", L"Select Device:", WS_CHILD | WS_VISIBLE | SS_NOPREFIX, 10, 13, 140, 20, m_hWnd, NULL, m_Instance, NULL);
-	SendMessage(hStatic, WM_SETFONT, (WPARAM)FontNormal, TRUE);
+	SendMessage(hStatic, WM_SETFONT, (WPARAM) FontNormal, TRUE);
 
 	hStatic = CreateWindow(L"STATIC", L"Drive Letter/Type:", WS_CHILD | WS_VISIBLE | SS_NOPREFIX, 10, 53, 140, 20, m_hWnd, NULL, m_Instance, NULL);
-	SendMessage(hStatic, WM_SETFONT, (WPARAM)FontNormal, TRUE);
+	SendMessage(hStatic, WM_SETFONT, (WPARAM) FontNormal, TRUE);
 
 	hStatic = CreateWindow(L"STATIC", L"Memory Size (MB):", WS_CHILD | WS_VISIBLE | SS_NOPREFIX, 10, 93, 140, 20, m_hWnd, NULL, m_Instance, NULL);
-	SendMessage(hStatic, WM_SETFONT, (WPARAM)FontNormal, TRUE);
+	SendMessage(hStatic, WM_SETFONT, (WPARAM) FontNormal, TRUE);
 
 	hStatic = CreateWindow(L"STATIC", L"Format Parameters:", WS_CHILD | WS_VISIBLE | SS_NOPREFIX, 10, 133, 140, 20, m_hWnd, NULL, m_Instance, NULL);
-	SendMessage(hStatic, WM_SETFONT, (WPARAM)FontNormal, TRUE);
+	SendMessage(hStatic, WM_SETFONT, (WPARAM) FontNormal, TRUE);
 
 	m_CtlGpuList = CreateWindow(L"COMBOBOX", NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWNLIST, 150, 10, 150, 25, m_hWnd, NULL, m_Instance, NULL);
-	SendMessage(m_CtlGpuList, WM_SETFONT, (WPARAM)FontNormal, TRUE);
+	SendMessage(m_CtlGpuList, WM_SETFONT, (WPARAM) FontNormal, TRUE);
 
 	m_CtlDriveLetter = CreateWindow(L"COMBOBOX", NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWNLIST, 150, 50, 150, 25, m_hWnd, NULL, m_Instance, NULL);
-	SendMessage(m_CtlDriveLetter, WM_SETFONT, (WPARAM)FontNormal, TRUE);
+	SendMessage(m_CtlDriveLetter, WM_SETFONT, (WPARAM) FontNormal, TRUE);
 	m_CtlDriveType = CreateWindow(L"COMBOBOX", NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWNLIST, 315, 50, 150, 25, m_hWnd, NULL, m_Instance, NULL);
-	SendMessage(m_CtlDriveType, WM_SETFONT, (WPARAM)FontNormal, TRUE);
+	SendMessage(m_CtlDriveType, WM_SETFONT, (WPARAM) FontNormal, TRUE);
 	m_CtlDriveRemovable = CreateWindow(L"COMBOBOX", NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWNLIST, 480, 50, 182, 25, m_hWnd, NULL, m_Instance, NULL);
-	SendMessage(m_CtlDriveRemovable, WM_SETFONT, (WPARAM)FontNormal, TRUE);
+	SendMessage(m_CtlDriveRemovable, WM_SETFONT, (WPARAM) FontNormal, TRUE);
 
 	m_CtlMemSize = CreateWindow(L"EDIT", L"1", WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_NUMBER, 150, 90, 150, 25, m_hWnd, NULL, m_Instance, NULL);
-	SendMessage(m_CtlMemSize, WM_SETFONT, (WPARAM)FontNormal, TRUE);
+	SendMessage(m_CtlMemSize, WM_SETFONT, (WPARAM) FontNormal, TRUE);
 
 	m_CtlFormatParam = CreateWindow(L"EDIT", L"/fs:exfat /q", WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP, 150, 130, 150, 25, m_hWnd, NULL, m_Instance, NULL);
-	SendMessage(m_CtlFormatParam, WM_SETFONT, (WPARAM)FontNormal, TRUE);
+	SendMessage(m_CtlFormatParam, WM_SETFONT, (WPARAM) FontNormal, TRUE);
 
 	m_CtlMountBtn = CreateWindow(L"BUTTON", L"Mount", WS_CHILD | WS_VISIBLE | WS_TABSTOP, 150, 190, 150, 40, m_hWnd, NULL, m_Instance, NULL);
-	SendMessage(m_CtlMountBtn, WM_SETFONT, (WPARAM)FontBold, TRUE);
+	SendMessage(m_CtlMountBtn, WM_SETFONT, (WPARAM) FontBold, TRUE);
 
 	wchar_t szTemp[64];
 	wcscpy_s(szTemp, L"X:");
-	for (wchar_t c = 'A'; c <= 'Z'; c++) {
+	for(wchar_t c = 'A'; c <= 'Z'; c++)
+	{
 		szTemp[0] = c;
 		ComboBox_AddString(m_CtlDriveLetter, szTemp);
 	}
@@ -178,15 +180,16 @@ void GpuRamGui::OnCreate()
 	{
 		m_RamDrive.RefreshGPUInfo();
 		auto v = m_RamDrive.GetGpuDevices();
-		for (auto it = v.begin(); it != v.end(); it++)
+		for(auto it = v.begin(); it != v.end(); it++)
 		{
 			ComboBox_AddString(m_CtlGpuList, ToWide(it->name + " (" + std::to_string(it->memsize / (1024 * 1024)) + " MB)").c_str());
-			if (it->memsize) {
-				suggestedRamSize = (int)(it->memsize * 0.8 / 1024 / 1024);
+			if(it->memsize)
+			{
+				suggestedRamSize = (int) (it->memsize * 0.8 / 1024 / 1024);
 			}
 		}
 	}
-	catch (const std::exception& ex)
+	catch(const std::exception& ex)
 	{
 		ComboBox_AddString(m_CtlGpuList, ToWide(ex.what()).c_str());
 	}
@@ -204,10 +207,13 @@ void GpuRamGui::OnCreate()
 		m_UpdateState = true;
 		InvalidateRect(m_hWnd, NULL, FALSE);
 
-		if (m_RamDrive.IsMounted()) {
+		if(m_RamDrive.IsMounted())
+		{
 			m_Tray.CreateIcon(m_hWnd, m_Icon, SWM_TRAYINTERACTION);
 			m_Tray.SetTooltip(L"GpuRamDrive");
-		} else {
+		}
+		else
+		{
 			m_Tray.Destroy();
 		}
 	});
@@ -229,27 +235,29 @@ void GpuRamGui::OnResize(WORD width, WORD height, bool minimized)
 	MoveWindow(m_CtlGpuList, 150, 10, width - 150 - 20, 20, TRUE);
 	MoveWindow(m_CtlMountBtn, width / 2 - 150, height - 90, 300, 70, TRUE);
 
-	if (m_RamDrive.IsMounted() && minimized) {
+	if(m_RamDrive.IsMounted() && minimized)
+	{
 		ShowWindow(m_hWnd, SW_HIDE);
 	}
 }
 
 void GpuRamGui::OnMountClicked()
 {
-	if (!m_RamDrive.IsMounted())
+	if(!m_RamDrive.IsMounted())
 	{
 		auto vGpu = m_RamDrive.GetGpuDevices();
 		int n = ComboBox_GetCurSel(m_CtlGpuList);
 
-		if (n >= (int)vGpu.size()) {
+		if(n >= (int) vGpu.size())
+		{
 			MessageBox(m_hWnd, L"GPU selection is invalid", L"Error while selecting GPU", MB_OK);
 			return;
 		}
 
-		wchar_t szTemp[64] = { 0 };
+		wchar_t szTemp[64] = {0};
 
 		Edit_GetText(m_CtlMemSize, szTemp, sizeof(szTemp) / sizeof(wchar_t));
-		size_t memSize = (size_t)_wtoi64(szTemp) * 1024 * 1024;
+		size_t memSize = (size_t) _wtoi64(szTemp) * 1024 * 1024;
 
 		Edit_GetText(m_CtlFormatParam, szTemp, sizeof(szTemp) / sizeof(wchar_t));
 		std::wstring formatParam = szTemp;
@@ -257,7 +265,8 @@ void GpuRamGui::OnMountClicked()
 		EGpuRamDriveType driveType = ComboBox_GetCurSel(m_CtlDriveType) == 0 ? eGpuRamDriveType_HD : eGpuRamDriveType_FD;
 		bool driveRemovable = ComboBox_GetCurSel(m_CtlDriveRemovable) == 0 ? false : true;
 
-		if (memSize >= vGpu[n].memsize) {
+		if(memSize >= vGpu[n].memsize)
+		{
 			MessageBox(m_hWnd, L"The memory size you specified is too large", L"Invalid memory size", MB_OK);
 			return;
 		}
@@ -270,7 +279,7 @@ void GpuRamGui::OnMountClicked()
 			m_RamDrive.SetRemovable(driveRemovable);
 			m_RamDrive.CreateRamDevice(vGpu[n].platform_id, vGpu[n].device_id, L"GpuRamDev", memSize, szTemp, formatParam);
 		}
-		catch (const std::exception& ex)
+		catch(const std::exception& ex)
 		{
 			MessageBoxA(m_hWnd, ex.what(), "Error while mounting GPU Ram Drive", MB_OK);
 		}
@@ -283,27 +292,30 @@ void GpuRamGui::OnMountClicked()
 
 void GpuRamGui::OnTrayInteraction(LPARAM lParam)
 {
-	switch (lParam)
+	switch(lParam)
 	{
-		case WM_LBUTTONUP:
-			if (IsWindowVisible(m_hWnd) && !IsIconic(m_hWnd)) {
-				ShowWindow(m_hWnd, SW_HIDE);
-			} else {
-				ShowWindow(m_hWnd, SW_RESTORE);
-				SetForegroundWindow(m_hWnd);
-			}
-			break;
-		case WM_RBUTTONUP:
-		case WM_CONTEXTMENU:
-			break;
+	case WM_LBUTTONUP:
+		if(IsWindowVisible(m_hWnd) && !IsIconic(m_hWnd))
+		{
+			ShowWindow(m_hWnd, SW_HIDE);
+		}
+		else
+		{
+			ShowWindow(m_hWnd, SW_RESTORE);
+			SetForegroundWindow(m_hWnd);
+		}
+		break;
+	case WM_RBUTTONUP:
+	case WM_CONTEXTMENU:
+		break;
 	}
 }
 
 void GpuRamGui::UpdateState()
 {
-	if (!m_UpdateState) return;
+	if(!m_UpdateState) return;
 
-	if (m_RamDrive.IsMounted())
+	if(m_RamDrive.IsMounted())
 	{
 		EnableWindow(m_CtlDriveLetter, FALSE);
 		EnableWindow(m_CtlDriveType, FALSE);
@@ -341,7 +353,7 @@ ATOM GpuRamGui::MyRegisterClass()
 	wcex.hInstance = m_Instance;
 	wcex.hIcon = m_Icon;
 	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW);
+	wcex.hbrBackground = (HBRUSH) (COLOR_WINDOW);
 	wcex.lpszMenuName = nullptr;
 	wcex.lpszClassName = GPU_GUI_CLASS;
 	wcex.hIconSm = wcex.hIcon;
@@ -351,62 +363,66 @@ ATOM GpuRamGui::MyRegisterClass()
 
 LRESULT CALLBACK GpuRamGui::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	GpuRamGui* _this = (GpuRamGui*)(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	GpuRamGui* _this = (GpuRamGui*) (GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
-	switch (message)
+	switch(message)
 	{
-		case WM_CREATE:
+	case WM_CREATE:
+	{
+		LPCREATESTRUCTW pCreateParam = (LPCREATESTRUCTW) lParam;
+		if(pCreateParam)
 		{
-			LPCREATESTRUCTW pCreateParam = (LPCREATESTRUCTW)lParam;
-			if (pCreateParam) {
-				_this = (GpuRamGui*)pCreateParam->lpCreateParams;
-				SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)pCreateParam->lpCreateParams);
-			}
-
-			if (_this) {
-				_this->m_hWnd = hWnd;
-				_this->OnCreate();
-			}
-			break;
+			_this = (GpuRamGui*) pCreateParam->lpCreateParams;
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) pCreateParam->lpCreateParams);
 		}
 
-		case WM_ENDSESSION:
-			if (_this) _this->OnEndSession();
-			break;
-
-		case WM_DESTROY:
-			if (_this) _this->OnDestroy();
-			break;
-
-		case WM_SIZE:
-			if (_this) _this->OnResize(LOWORD(lParam), HIWORD(lParam), wParam == SIZE_MINIMIZED);
-			break;
-
-		case WM_PAINT:
-			_this->UpdateState();
-			return DefWindowProc(hWnd, message, wParam, lParam);
-			break;
-
-		case WM_COMMAND:
+		if(_this)
 		{
-			if (_this) {
-				if ((HANDLE)lParam == _this->m_CtlMountBtn) {
-					EnableWindow(_this->m_CtlMountBtn, FALSE);
-					_this->OnMountClicked();
-					EnableWindow(_this->m_CtlMountBtn, TRUE);
-				}
+			_this->m_hWnd = hWnd;
+			_this->OnCreate();
+		}
+		break;
+	}
+
+	case WM_ENDSESSION:
+		if(_this) _this->OnEndSession();
+		break;
+
+	case WM_DESTROY:
+		if(_this) _this->OnDestroy();
+		break;
+
+	case WM_SIZE:
+		if(_this) _this->OnResize(LOWORD(lParam), HIWORD(lParam), wParam == SIZE_MINIMIZED);
+		break;
+
+	case WM_PAINT:
+		_this->UpdateState();
+		return DefWindowProc(hWnd, message, wParam, lParam);
+		break;
+
+	case WM_COMMAND:
+	{
+		if(_this)
+		{
+			if((HANDLE) lParam == _this->m_CtlMountBtn)
+			{
+				EnableWindow(_this->m_CtlMountBtn, FALSE);
+				_this->OnMountClicked();
+				EnableWindow(_this->m_CtlMountBtn, TRUE);
 			}
-			break;
 		}
+		break;
+	}
 
-		case SWM_TRAYINTERACTION:
-			if (_this) _this->OnTrayInteraction(lParam);
-			break;
+	case SWM_TRAYINTERACTION:
+		if(_this) _this->OnTrayInteraction(lParam);
+		break;
 
-		default:
-		{
-			return DefWindowProc(hWnd, message, wParam, lParam);
-		}
+	default:
+	{
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
 	}
 
 	return 0;
