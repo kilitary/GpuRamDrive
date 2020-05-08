@@ -200,7 +200,7 @@ void GPURamDrive::CreateRamDevice(cl_platform_id PlatformId, cl_device_id Device
 	m_ServiceName = ServiceName;
 	sz_PreLoadFileName[MAX_PATH] = 0x0;
 
-	if(fileName && fileName[0])
+	if(fileName)
 		wcscpy(sz_PreLoadFileName, fileName);
 
 	std::exception state_ex;
@@ -217,7 +217,7 @@ void GPURamDrive::CreateRamDevice(cl_platform_id PlatformId, cl_device_id Device
 	{
 		try
 		{
-			if(sz_PreLoadFileName[0])
+			if(fileName)
 			{
 				FILE *fp;
 				DWORD fileSize = 0x0;
@@ -228,7 +228,7 @@ void GPURamDrive::CreateRamDevice(cl_platform_id PlatformId, cl_device_id Device
 					fileSize = ftell(fp);
 					fclose(fp);
 
-					tools::deb("gpu> file = '%s', file size = %d", fileName, fileSize);
+					tools::deb("gpu> file = '%ls', file size = %d", fileName, fileSize);
 				}
 				else if(sz_PreLoadFileName[0])
 					tools::deb("gpu> no preload file '%ls'", sz_PreLoadFileName);
@@ -296,19 +296,16 @@ void GPURamDrive::ImdiskMountDevice(const wchar_t* MountPoint)
 {
 	DISK_GEOMETRY dskGeom = {0};
 	DWORD flags = IMDISK_TYPE_PROXY | IMDISK_PROXY_TYPE_SHM | (DWORD) m_DriveType;
-	if(m_DriveRemovable) flags |= IMDISK_OPTION_REMOVABLE;
+	if(m_DriveRemovable)
+		flags |= IMDISK_OPTION_REMOVABLE;
 
 	ImDiskSetAPIFlags(IMDISK_API_FORCE_DISMOUNT);
 
 	m_MountPoint = MountPoint;
 	if(!ImDiskCreateDevice(NULL, &dskGeom, nullptr, flags, m_ServiceName.c_str(), FALSE, (LPWSTR) MountPoint))
-	{
 		throw std::runtime_error("Unable to create and mount ImDisk drive");
-	}
 	else
-	{
 		tools::deb("created device from servicename %ls", m_ServiceName.c_str());
-	}
 }
 
 void GPURamDrive::ImdiskUnmountDevice()
@@ -477,7 +474,7 @@ void GPURamDrive::ImdiskSetupComm(const std::wstring& ServiceName)
 		throw std::runtime_error("Unable to create file mapping: " + std::to_string(dwErr));
 	}
 
-	tools::deb("file map %ls", sTemp.c_str());
+	tools::deb("file map '%ls' %x", sTemp.c_str(), m_ShmHandle);
 
 	if(dwErr == ERROR_ALREADY_EXISTS)
 	{
@@ -498,6 +495,8 @@ void GPURamDrive::ImdiskSetupComm(const std::wstring& ServiceName)
 	}
 
 	m_BufStart = (char*) m_ShmView + IMDPROXY_HEADER_SIZE;
+
+	tools::deb("m_buf @ %p", m_BufStart);
 
 
 	sTemp = sPrefix + ServiceName + L"_Server";

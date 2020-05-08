@@ -24,7 +24,7 @@ class GpuRamGui
 	GpuRamGui();
 	~GpuRamGui();
 
-	bool Create(HINSTANCE hInst, const std::wstring& title, int nCmdShow);
+	bool Create(HINSTANCE hInst, const std::wstring& title, int nCmdShow, LPWSTR);
 	int Loop();
 	void Mount(const std::wstring& device, size_t size, const std::wstring& driveLetter, const std::wstring& formatParam, 
 		const std::wstring& driveType, bool removable, LPWSTR fileName);
@@ -38,6 +38,8 @@ class GpuRamGui
 	void OnMountClicked();
 	void OnTrayInteraction(LPARAM lParam);
 	void UpdateState();
+
+	LPWSTR sz_PreLoadFileName[MAX_PATH];
 
 	ATOM MyRegisterClass();
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

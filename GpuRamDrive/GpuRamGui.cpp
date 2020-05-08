@@ -59,9 +59,13 @@ GpuRamGui::~GpuRamGui()
 {
 }
 
-bool GpuRamGui::Create(HINSTANCE hInst, const std::wstring& title, int nCmdShow)
+bool GpuRamGui::Create(HINSTANCE hInst, const std::wstring& title, int nCmdShow, LPWSTR fileName)
 {
 	m_Instance = hInst;
+
+	if(fileName)
+		wcscpy((wchar_t*) sz_PreLoadFileName, fileName);
+
 	SetProcessDPIAware();
 
 	MyRegisterClass();
@@ -107,12 +111,14 @@ void GpuRamGui::Mount(const std::wstring& device, size_t size, const std::wstrin
 		}
 	}
 
+	wcscpy((wchar_t*) sz_PreLoadFileName, fileName);
+
 	if(!found) throw std::runtime_error("Unable to find device specified");
 
 
 	m_RamDrive.SetDriveType(driveType.c_str());
 	m_RamDrive.SetRemovable(removable);
-	m_RamDrive.CreateRamDevice(vGpu[n].platform_id, vGpu[n].device_id, L"GpuRamDev", memSize, driveLetter.c_str(), formatParam, fileName);
+	m_RamDrive.CreateRamDevice(vGpu[n].platform_id, vGpu[n].device_id, L"GpuRamDev", memSize, driveLetter.c_str(), formatParam, (LPWSTR) sz_PreLoadFileName);
 
 	ComboBox_SetCurSel(m_CtlGpuList, n);
 	ComboBox_SetCurSel(m_CtlDriveLetter, (driveLetter[0] <= 'Z' ? driveLetter[0] - 'A' : driveLetter[0] - 'a'));
@@ -282,7 +288,7 @@ void GpuRamGui::OnMountClicked()
 		{
 			m_RamDrive.SetDriveType(driveType);
 			m_RamDrive.SetRemovable(driveRemovable);
-			m_RamDrive.CreateRamDevice(vGpu[n].platform_id, vGpu[n].device_id, L"GpuRamDev", memSize, szTemp, formatParam);
+			m_RamDrive.CreateRamDevice(vGpu[n].platform_id, vGpu[n].device_id, L"GpuRamDev", memSize, szTemp, formatParam, (LPWSTR) sz_PreLoadFileName);
 		}
 		catch(const std::exception& ex)
 		{
@@ -320,7 +326,6 @@ void GpuRamGui::UpdateState()
 {
 	if(!m_UpdateState) return;
 
-	tools::deb("m_RamDrive.IsMounted() = %x", m_RamDrive.IsMounted());
 	if(m_RamDrive.IsMounted())
 	{
 		EnableWindow(m_CtlDriveLetter, FALSE);
@@ -416,6 +421,7 @@ LRESULT CALLBACK GpuRamGui::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 				EnableWindow(_this->m_CtlMountBtn, FALSE);
 				_this->OnMountClicked();
 				EnableWindow(_this->m_CtlMountBtn, TRUE);
+				_this->UpdateState();
 			}
 		}
 		break;

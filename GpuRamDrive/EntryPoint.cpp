@@ -28,6 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "stdafx.h"
 #include "GpuRamDrive.h"
 #include "GpuRamGui.h"
+#include "tools.h"
 
 const wchar_t GPU_HELP_STRING[] = L"Usage:\n"
 "  GpuRamDrive.exe --device CUDA --size 256 --mount j: --format \"/fs:exfat /q\"\n"
@@ -77,6 +78,7 @@ int APIENTRY wWinMain(
 			else if(_wcsicmp(szArglist[i], L"--file") == 0 && i + 1 < nArgs)
 			{
 				sz_PreLoadFileName = szArglist[i + 1];
+				tools::deb("loading shit from '%ls'", sz_PreLoadFileName);
 			}
 			else if(_wcsicmp(szArglist[i], L"--size") == 0 && i + 1 < nArgs)
 			{
@@ -124,7 +126,7 @@ int APIENTRY wWinMain(
 		GpuMount = GpuDevice && GpuSize && GpuDriveLetter;
 	}
 
-	if(!gui.Create(hInstance, L"GPU Ram Drive", nCmdShow))
+	if(!gui.Create(hInstance, L"GPU Ram Drive", nCmdShow, sz_PreLoadFileName))
 	{
 		return -1;
 	}
