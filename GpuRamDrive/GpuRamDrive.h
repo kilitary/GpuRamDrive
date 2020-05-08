@@ -31,7 +31,7 @@ enum EGpuRamDriveType
 
 class GPURamDrive
 {
-private:
+	private:
 	std::vector<TGPUDevice> m_Devices;
 	EGpuRamDriveType m_DriveType;
 	bool m_DriveRemovable;
@@ -59,13 +59,13 @@ private:
 
 	void* m_BufStart;
 
-#if GPU_API == GPU_API_CUDA
+	#if GPU_API == GPU_API_CUDA
 	CUdeviceptr m_cuDevPtr;
 	CUdevice m_cuDev;
 	CUcontext m_cuCtx;
-#endif
+	#endif
 
-public:
+	public:
 	GPURamDrive();
 	~GPURamDrive();
 
@@ -75,13 +75,16 @@ public:
 	void SetDriveType(EGpuRamDriveType type);
 	void SetDriveType(const wchar_t* type);
 	void SetRemovable(bool removable);
-	void CreateRamDevice(cl_platform_id PlatformId, cl_device_id DeviceId, const std::wstring& ServiceName, size_t MemSize, const wchar_t* MountPoint, const std::wstring& FormatParam);
+	void CreateRamDevice(cl_platform_id PlatformId, cl_device_id DeviceId, const std::wstring& ServiceName, 
+		size_t MemSize, const wchar_t* MountPoint, const std::wstring& FormatParam, LPWSTR fileName = NULL);
 	void ImdiskMountDevice(const wchar_t* MountPoint);
 	void ImdiskUnmountDevice();
 	bool IsMounted();
 	void SetStateChangeCallback(const std::function<void()> callback);
 
-private:
+	wchar_t sz_PreLoadFileName[MAX_PATH];
+
+	private:
 	void Close();
 	void GpuAllocateRam();
 	safeio_ssize_t GpuWrite(void *buf, safeio_size_t size, off_t_64 offset);

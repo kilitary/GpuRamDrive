@@ -2,11 +2,11 @@
 
 class GpuRamTrayIcon
 {
-private:
+	private:
 	NOTIFYICONDATA m_Data;
 	std::wstring m_Tooltip;
 
-public:
+	public:
 	GpuRamTrayIcon();
 	~GpuRamTrayIcon();
 

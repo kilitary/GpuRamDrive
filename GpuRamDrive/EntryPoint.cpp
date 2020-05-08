@@ -40,7 +40,8 @@ const wchar_t GPU_HELP_STRING[] = L"Usage:\n"
 "  --type <type>            Drive type: hd or fd\n"
 "  --removable              Create a removable drive\n"
 "  --hide                   Hide GUI to tray\n"
-"  --help                   Show this help\n";
+"  --help                   Show this help\n"
+"  --file <File Path>       Use filename to preload content\n";
 
 
 int APIENTRY wWinMain(
@@ -60,6 +61,7 @@ int APIENTRY wWinMain(
 	LPWSTR GpuDriveLetter = nullptr;
 	LPWSTR GpuFormatParam = L"";
 	LPWSTR GpuDriveType = L"HD";
+	LPWSTR sz_PreLoadFileName = L"";
 	bool GpuDriveRemovable = false;
 	bool GpuMount = false;
 	bool HelpRequest = false;
@@ -71,6 +73,10 @@ int APIENTRY wWinMain(
 			if(_wcsicmp(szArglist[i], L"--device") == 0 && i + 1 < nArgs)
 			{
 				GpuDevice = szArglist[i + 1];
+			}
+			else if(_wcsicmp(szArglist[i], L"--file") == 0 && i + 1 < nArgs)
+			{
+				sz_PreLoadFileName = szArglist[i + 1];
 			}
 			else if(_wcsicmp(szArglist[i], L"--size") == 0 && i + 1 < nArgs)
 			{
@@ -127,7 +133,7 @@ int APIENTRY wWinMain(
 	{
 		try
 		{
-			gui.Mount(GpuDevice, GpuSize, GpuDriveLetter, GpuFormatParam, GpuDriveType, GpuDriveRemovable);
+			gui.Mount(GpuDevice, GpuSize, GpuDriveLetter, GpuFormatParam, GpuDriveType, GpuDriveRemovable, sz_PreLoadFileName);
 		}
 		catch(const std::exception& ex)
 		{

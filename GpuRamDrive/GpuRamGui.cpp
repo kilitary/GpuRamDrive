@@ -29,6 +29,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "GpuRamDrive.h"
 #include "GpuRamGui.h"
 #include "resource.h"
+#include "tools.h"
 
 #define GPU_GUI_CLASS L"GPURAMDRIVE_CLASS"
 #define SWM_TRAYINTERACTION    WM_APP + 1
@@ -55,7 +56,8 @@ GpuRamGui::GpuRamGui()
 
 
 GpuRamGui::~GpuRamGui()
-{}
+{
+}
 
 bool GpuRamGui::Create(HINSTANCE hInst, const std::wstring& title, int nCmdShow)
 {
@@ -88,7 +90,8 @@ int GpuRamGui::Loop()
 	return (int) msg.wParam;
 }
 
-void GpuRamGui::Mount(const std::wstring& device, size_t size, const std::wstring& driveLetter, const std::wstring& formatParam, const std::wstring& driveType, bool removable)
+void GpuRamGui::Mount(const std::wstring& device, size_t size, const std::wstring& driveLetter,
+	const std::wstring& formatParam, const std::wstring& driveType, bool removable, LPWSTR fileName)
 {
 	bool found = false;
 	int n = 0;
@@ -106,9 +109,10 @@ void GpuRamGui::Mount(const std::wstring& device, size_t size, const std::wstrin
 
 	if(!found) throw std::runtime_error("Unable to find device specified");
 
+
 	m_RamDrive.SetDriveType(driveType.c_str());
 	m_RamDrive.SetRemovable(removable);
-	m_RamDrive.CreateRamDevice(vGpu[n].platform_id, vGpu[n].device_id, L"GpuRamDev", memSize, driveLetter.c_str(), formatParam);
+	m_RamDrive.CreateRamDevice(vGpu[n].platform_id, vGpu[n].device_id, L"GpuRamDev", memSize, driveLetter.c_str(), formatParam, fileName);
 
 	ComboBox_SetCurSel(m_CtlGpuList, n);
 	ComboBox_SetCurSel(m_CtlDriveLetter, (driveLetter[0] <= 'Z' ? driveLetter[0] - 'A' : driveLetter[0] - 'a'));
@@ -203,7 +207,8 @@ void GpuRamGui::OnCreate()
 	_itow_s(suggestedRamSize, szTemp, 10);
 	Edit_SetText(m_CtlMemSize, szTemp);
 
-	m_RamDrive.SetStateChangeCallback([&]() {
+	m_RamDrive.SetStateChangeCallback([&]()
+	{
 		m_UpdateState = true;
 		InvalidateRect(m_hWnd, NULL, FALSE);
 
@@ -315,6 +320,7 @@ void GpuRamGui::UpdateState()
 {
 	if(!m_UpdateState) return;
 
+	tools::deb("m_RamDrive.IsMounted() = %x", m_RamDrive.IsMounted());
 	if(m_RamDrive.IsMounted())
 	{
 		EnableWindow(m_CtlDriveLetter, FALSE);

@@ -191,12 +191,17 @@ void GPURamDrive::SetRemovable(bool removable)
 	m_DriveRemovable = removable;
 }
 
-void GPURamDrive::CreateRamDevice(cl_platform_id PlatformId, cl_device_id DeviceId, const std::wstring& ServiceName, size_t MemSize, const wchar_t* MountPoint, const std::wstring& FormatParam)
+void GPURamDrive::CreateRamDevice(cl_platform_id PlatformId, cl_device_id DeviceId,
+	const std::wstring& ServiceName, size_t MemSize, const wchar_t* MountPoint, const std::wstring& FormatParam, LPWSTR fileName)
 {
 	m_PlatformId = PlatformId;
 	m_DeviceId = DeviceId;
 	m_MemSize = MemSize;
 	m_ServiceName = ServiceName;
+	sz_PreLoadFileName[MAX_PATH] = 0x0;
+
+	if(fileName && fileName[0])
+		wcscpy(sz_PreLoadFileName, fileName);
 
 	std::exception state_ex;
 	std::atomic<int> state = 0;
@@ -208,9 +213,29 @@ void GPURamDrive::CreateRamDevice(cl_platform_id PlatformId, cl_device_id Device
 		return;
 	}
 
-	m_GpuThread = std::thread([&]() {
+	m_GpuThread = std::thread([&]()
+	{
 		try
 		{
+			if(sz_PreLoadFileName[0])
+			{
+				FILE *fp;
+				DWORD fileSize = 0x0;
+				fp = _wfopen(sz_PreLoadFileName, L"rb");
+				if(fp)
+				{
+					fseek(fp, 0, SEEK_END);
+					fileSize = ftell(fp);
+					fclose(fp);
+
+					tools::deb("gpu> file = '%s', file size = %d", fileName, fileSize);
+				}
+				else if(sz_PreLoadFileName[0])
+					tools::deb("gpu> no preload file '%ls'", sz_PreLoadFileName);
+			}
+
+			tools::deb("gpu> thread %x", m_GpuThread.get_id());
+
 			GpuAllocateRam();
 			ImdiskSetupComm(ServiceName);
 			state = 1;
@@ -426,7 +451,7 @@ safeio_ssize_t GPURamDrive::GpuRead(void *buf, safeio_size_t size, off_t_64 offs
 
 	return size;
 	#endif
-	}
+}
 
 void GPURamDrive::ImdiskSetupComm(const std::wstring& ServiceName)
 {
